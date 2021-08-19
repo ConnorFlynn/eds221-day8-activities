@@ -1,0 +1,91 @@
+---
+title: "Data Viz Activities"
+author: "Connor Flynn"
+date: "8/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+```
+
+```{r}
+space <- read_csv(here("data",
+                       "space_launches.csv"))
+```
+
+
+Bad Plot
+
+```{r}
+ggplot(data = space, aes(x = JD, y = category,
+                         color = tag)) +
+  geom_abline(show.legend = TRUE) +
+  theme_linedraw() +
+  ggtitle("Progression is Everything", subtitle = "A story of growth demonstrated by space data") +
+  labs(y = "Progression", x = "Everything") +
+  theme(
+    panel.background = element_rect(fill = "cyan4"),
+    plot.title = element_text(color = "red", face = "bold"),
+    plot.subtitle = element_text(color = "orange", face = "italic"),
+    axis.title.x = element_text(color = "red", face = "bold", size = 15),
+    axis.title.y = element_text(color = "orange", face = "bold", size = 15),
+    legend.key = element_rect(fill = "orange") 
+  ) +
+     scale_x_continuous(limits = c("beginning", "slightly after the begining"))
+                        
+    
+
+
+```
+
+task 2
+
+```{r}
+sf_data <- read_csv(here("data", "San_Francisco_Communitywide_Greenhouse_Gas_Inventory.csv"))
+
+df_mtCO2E <- sf_data %>% 
+  group_by(Sector_General) %>% 
+  summarize(Sector_Emissions_mtCO2e = sum(Emissions_mtCO2e))
+
+df_mtCO2E_year_commodity <- sf_data %>% 
+  group_by(Calendar_Year, Commodity_Type) %>% 
+  summarise(Year_Commodity_Emissions_mtcO2e = sum(Emissions_mtCO2e))
+
+
+sf_data2005 <- sf_data %>% 
+  select(Calendar_Year, Sector_Detail2,
+         Emissions_mtCO2e) %>% 
+  filter(Calendar_Year >= 2005) %>%  filter(str_detect(Sector_Detail2, pattern = "PG&E"))
+```
+
+Task 3
+
+```{r}
+space_1 <- space_1 %>% 
+  group_by(launch_year) %>% 
+  count(n)
+
+space_2 <- space %>% 
+  group_by(launches = launch_year) %>% 
+  count(launches) %>% 
+  mutate(launches = lubridate::y(launches))
+
+space_3 <- space %>% 
+  group_by(launch_year, agency_type) %>%
+  count(launch_year) %>% 
+  rename(launches_per_year = n) 
+  
+
+ggplot(data = space_3, aes(x = launch_year, y = launches_per_year, fill = agency_type)) +
+  geom_col() +
+  theme_test() +
+  ggtitle("Space Launches per Year by Agency Type") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
